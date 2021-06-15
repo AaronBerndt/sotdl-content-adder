@@ -18,6 +18,7 @@ interface AncestryFormValues {
   characteristics: Characteristics;
   talents: Talents;
   book: string;
+  page: string;
 }
 
 const Label = ({ title }: any) => (
@@ -36,6 +37,7 @@ export default function AncestryForm() {
     characteristics: [{ name: "Strength", value: 10, level: 0 }],
     talents: [{ name: "", description: "", level: 0 }],
     book: "",
+    page: "",
   };
 
   const attributeList = [
@@ -75,6 +77,14 @@ export default function AncestryForm() {
             <div>
               <Label title="description" />
               <Field as="textarea" id="description" name="description" />
+            </div>
+            <div>
+              <Label title="Book" />
+              <Field id="book" name="book" />
+            </div>
+            <div>
+              <Label title="Page" />
+              <Field id="page" name="page" />
             </div>
 
             <h3>Additional Characteristics</h3>
