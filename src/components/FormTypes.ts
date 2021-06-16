@@ -14,6 +14,7 @@ export type Talent = {
 };
 
 export type Ancestry = {
+  _id: string;
   name: string;
   id: number;
   description: string;
@@ -26,6 +27,7 @@ export type Ancestry = {
 export type PathType = "Novice" | "Expert" | "Master";
 
 export type Path = {
+  _id: string;
   name: string;
   type: PathType;
   description: string;
@@ -89,6 +91,7 @@ export type Trandition =
 
 export type Spells = Spell[];
 export type Spell = {
+  _id: string;
   name: string;
   tradition: Trandition;
   level: number;

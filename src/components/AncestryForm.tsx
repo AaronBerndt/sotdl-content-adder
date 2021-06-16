@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import {
-  Formik,
-  FormikHelpers,
-  FormikProps,
-  Form,
-  Field,
-  FieldProps,
-  FieldArray,
-} from "formik";
 import useAddContent from "../hooks/useAddContent";
 import LevelSelector from "./LevelSelector";
-import { Characteristics, DetailChoices, Talents } from "./FormTypes";
+import { Ancestry, Characteristics, DetailChoices, Talents } from "./FormTypes";
+import useAncestries from "./useAncestries";
+import { AutoComplete, Col, Form, Grid, Input, Row } from "antd";
+const { TextArea } = Input;
 
 interface AncestryFormValues {
   name: string;
@@ -29,7 +23,10 @@ const Label = ({ title }: any) => (
 
 export default function AncestryForm() {
   const { mutate: addAncestry } = useAddContent("ancestry");
+  const { data: ancestries, isLoading } = useAncestries();
   const [talentList, setTalentList] = useState([]);
+  const [nameOptions, setNameOptions] = useState<{ value: string }[]>([]);
+  const [bookOptions, setBookOptions] = useState<{ value: string }[]>([]);
 
   const initiaValues: AncestryFormValues = {
     name: "",
@@ -55,104 +52,79 @@ export default function AncestryForm() {
     "Perception",
     "Health",
   ];
+
+  if (isLoading) {
+    return <div>Is Loading</div>;
+  }
+
+  const onNameSearch = (searchText: string) => {
+    setNameOptions(
+      !searchText
+        ? []
+        : ancestries.filter(({ name }: Ancestry) => name.includes(name))
+    );
+  };
+  const onBookSearch = (searchText: string) => {
+    setNameOptions(
+      !searchText
+        ? []
+        : ancestries.filter(({ book }: Ancestry) => book.includes(book))
+    );
+  };
+
+  const onSelect = (data: string) => {
+    console.log("onSelect", data);
+  };
+
   return (
-    <div>
-      <h1>Add Ancestry</h1>
-      <Formik
-        initialValues={initiaValues}
-        onSubmit={(values, actions) => {
-          console.log({ values, actions });
-          actions.setSubmitting(false);
+    <>
+      <Row>
+        <Col>
+          <AutoComplete
+            options={ancestries.map(({ name }: Ancestry) => ({
+              name,
+              value: name,
+            }))}
+            style={{ width: 200 }}
+            onSelect={() => onSelect}
+            placeholder="Filter By Name"
+          />
+        </Col>
+        <Col>
+          <AutoComplete
+            options={ancestries.map(({ book }: Ancestry) => ({
+              name: book,
+              value: book,
+            }))}
+            style={{ width: 200 }}
+            onSelect={onSelect}
+            onSearch={onBookSearch}
+            placeholder="Filter By Book"
+          />
+        </Col>
+      </Row>
+      <Form>
+        {ancestries.map((ancestry: Ancestry) => (
+          <Form initialValues={ancestry} key={ancestry._id}>
+            <Form.Item label="Name" name="name">
+              <Input disabled />
+            </Form.Item>
+            <Form.Item label="Book" name="book">
+              <Input disabled />
+            </Form.Item>
 
-          /* addAncestry() */
-        }}
-      >
-        {({ values }) => (
-          <Form>
-            <div>
-              <Label title="name" />
-              <Field id="name" name="name" placeholder="" />
-            </div>
-
-            <div>
-              <Label title="description" />
-              <Field as="textarea" id="description" name="description" />
-            </div>
-            <div>
-              <Label title="Book" />
-              <Field id="book" name="book" />
-            </div>
-            <div>
-              <Label title="Page" />
-              <Field id="page" name="page" />
-            </div>
-
-            <h3>Additional Characteristics</h3>
-            <FieldArray name="characteristics">
-              {({ insert, remove, push }) => (
-                <>
-                  {values.characteristics.map((characteristic, i) => (
-                    <div>
-                      <Field as="select" name={`characteristics.${i}.name`}>
-                        {attributeList.map((attribute, i) => (
-                          <option value={attribute} key={i}>
-                            {attribute}
-                          </option>
-                        ))}
-                      </Field>
-                      <Field
-                        name={`characteristics.${i}.value`}
-                        type="number"
-                      />
-                      <LevelSelector keyValue={i} fieldName="characteristics" />
-                    </div>
-                  ))}
-                  <button
-                    onClick={() =>
-                      push({ name: "Strength", value: 0, level: 0 })
-                    }
-                  >
-                    +
-                  </button>
-                </>
-              )}
-            </FieldArray>
-            <div>
-              <h3>Talents</h3>
-              <FieldArray name="talents">
-                {({ insert, remove, push }) => (
-                  <>
-                    {values.talents.map((talent, i) => (
-                      <div>
-                        <Field name={`talents.${i}.name`} type="text" />
-                        <Field
-                          name={`talents.${i}.description`}
-                          type="string"
-                        />
-                        <LevelSelector keyValue={i} fieldName="talents" />
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={() =>
-                        push({
-                          talentName: "",
-                          talentDescription: "",
-                          level: 0,
-                        })
-                      }
-                    >
-                      +
-                    </button>
-                  </>
-                )}
-              </FieldArray>
-            </div>
-
-            <button type="submit">Submit</button>
+            <Form.Item
+              label="Description"
+              name="description"
+              rules={[
+                { required: true, message: "Please input your description!" },
+              ]}
+            >
+              <TextArea rows={4} />
+            </Form.Item>
           </Form>
-        )}
-      </Formik>
-    </div>
+        ))}
+      </Form>
+    </>
   );
 }

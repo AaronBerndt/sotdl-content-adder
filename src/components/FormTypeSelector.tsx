@@ -1,20 +1,20 @@
 import React from "react";
+import { Select } from "antd";
+const { Option } = Select;
 
 type Props = {
   selectFormType: Function;
 };
 export default function FormTypeSelector({ selectFormType }: Props) {
-  const onChange = (e: any) => selectFormType(e.target.value);
+  const onChange = (value: string) => selectFormType(value);
 
   return (
-    <>
-      <select name="cars" onChange={onChange}>
-        {["Path", "Ancestry", "Spell", "Item"].map((formType, i) => (
-          <option value={formType.toLowerCase()} key={i}>
-            {formType}
-          </option>
-        ))}
-      </select>
-    </>
+    <Select defaultValue="Ancestry" onChange={onChange} style={{ width: 120 }}>
+      {["Ancestry", "Path", "Spell", "Item"].map((formType, i) => (
+        <Option value={formType.toLowerCase()} key={i}>
+          {formType}
+        </Option>
+      ))}
+    </Select>
   );
 }
