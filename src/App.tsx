@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import "antd/dist/antd.css";
 import FormTypeSelector from "./components/FormTypeSelector";
 import AncestryForm from "./components/AncestryForm";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 function App() {
+  const queryClient = new QueryClient();
   const [formType, setFormType] = useState("ancestry");
 
   const formToRender: any = {
@@ -16,13 +17,13 @@ function App() {
   };
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <div>
         <FormTypeSelector selectFormType={setFormType} />
       </div>
 
       <div>{formToRender[formType]()}</div>
-    </>
+    </QueryClientProvider>
   );
 }
 
